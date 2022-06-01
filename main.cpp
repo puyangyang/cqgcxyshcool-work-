@@ -1,62 +1,176 @@
 #include<stdio.h>
-
-struct Country
+#include<string.h>
+#include<stdlib.h>
+struct Account
 {
 	char name[100];
-	int goldNum;
-	int silverNum;
-	int bronzeNum;
-	int totalNum;
+	char password[7];
+	char idcard[19];
+	char tel[12];
+	char username[100];//卡号待查询
+	float money;
+	struct Account *next;
 };
-typedef struct Country Country;
 
-void printCountry(Country c)
+typedef struct Account Account;
+	Account *head=NULL;
+	Account *tail=NULL;
+
+void loadDate()//更新数据
 {
-	printf("%s\t%d\t%d\t%d\t%d\n",c.name,c.goldNum,c.silverNum,c.bronzeNum,c.totalNum);
+	FILE *fp=fopen("E://name.txt","r");
+	if(fp!=NULL)
+	{
+		while(!feof(fp))
+		{
+			Account *Node=(Account *)malloc(sizeof(Account));
+			fscanf(fp,"%s %s %s\n",Node->name,Node->username,Node->password);
+			Node->next=NULL;
+			if(head==NULL)
+			{
+				head=Node;
+				tail=Node;
+			}
+			else
+			{
+				tail->next=Node;
+				tail=Node;
+			}
+		}
+	printf("加载完毕！\n");
+	fclose(fp);
+	}
+}
+void printAccount(Account a)//打印账户信息
+{
+	printf("%s\t%s\t%s\n",a.name,a.username,a.password);
+}
+void printLinkedList()//打印链表
+{
+	Account *curp=head;
+	while(curp!=NULL)
+	{
+		printAccount(*curp);
+		curp=curp->next;
+	}
+}
+void saveDate()//保存数据
+{
+	FILE *fp=fopen("E:/name.txt","w");
+	if(fp!=NULL)
+	{
+		Account *curp=head;
+		while(curp!=NULL)
+		{
+			fprintf(fp,"%s\t%s\t%s\n",curp->name,curp->username,curp->password);
+			curp=curp->next;
+		}
+		fclose(fp);
+	}
 }
 
-void bubbleSort(Country a[],int n)
+void signUp()//登录
 {
-	for(int i=0;i<n;i++)
+	Account a;
+	printf("请输入卡号：\n");
+	scanf("%s",a.username);
+
+	printf("请输入密码：\n");
+	scanf("%s",a.password);
+
+}
+
+void creataccount()//创建账号
+{
+	Account a;
+	while(1)
 	{
-		for(int j=0;j<n;j++)
+	printf("请输入姓名：\n身份证号：\n电话号码：\n");
+	scanf("%s %s %s",a.name,a.idcard,a.tel);
+	printf("请输入初始金额：\n");
+	scanf("%f",&a.money);
+	printf("正在创建账户，请稍等\n");
+	//随机卡号
+	stand(time(0));
+	int m=rand();
+	a.username=m%1000+10000000;
+	printf("这是您的卡号\n");
+	printf("%s",a.username);
+	}
+}
+
+void signIn()
+{
+	Account a,b;
+	int n;
+	printf("请输入账号：\n");
+	printf("请输入密码：\n");
+	scanf("%s",a.password);
+	printf("请在输入一次密码:\n");
+	scanf("%s",b.password);
+	if(strcmp(a.password,a.password)==0)
+	{
+		printf("请选择业务\n");
+		printf("=====================================\n");
+		printf("1.存款\t2.转账\t3.查询余额\n");
+		printf("4.修改密码\t5.打回执单\t6.退卡\n");
+		printf("=====================================\n");
+		while(1)
 		{
-			if(a[j].goldNum>a[j+1].goldNum)
+			printf("请输入你要选择的数字\n");
+			scanf("%d",&n);
+			switch(n)
 			{
-				Country t=a[j];
-				a[j]=a[j+1];
-				a[j+1]=t;
+			case 1:cunkuan();break;
+			case 2:zhuanzhang();break;
+			case 3:chaxun();break;
+			case 4:xiugaimima();break;
+			case 5:huizhidan();break;
+			case 6:tuika();break;
 			}
 		}
 	}
+
 }
 
+void showChinese()
+{
+
+	printf("输入1，创建账户\n");
+	printf("输入2，登录\n");
+	char c;
+
+	scanf("%s",&c);
+	if(c=='1')
+	{
+		signUp();
+	}
+	else if(c=='2')
+	{
+		signIn();
+	}
+}
+
+void showEnglish()
+{
+	//do something...
+}
 
 int main()
 {
-	Country c[8];
-	FILE* fp=fopen("D:/test.txt","r");
-	if(fp==NULL)
+	printf("输入1，选择中文\n");
+	printf("Input 2，Show English\n");
+	char c;
+	scanf("%c",&c);
+	if(c=='1')
 	{
-		printf("error\n");
-		return 0;
+		showChinese();//显示中文菜单
+	}
+	else if(c=='2')
+	{
+		showEnglish();//显示英文菜单
 	}
 
-	for(int i=0;i<8;i++)
-	{
-		fscanf(fp,"%s %d %d %d %d",c[i].name,&c[i].goldNum,&c[i].silverNum,&c[i].bronzeNum,&c[i].totalNum);
-	}
-	
-	fclose(fp);
-
-	bubbleSort(c,8);
-
-	FILE* outfp=fopen("D:/newnew.txt","w");
-	for(int j=0;j<8;j++)
-	{
-		fprintf(outfp,"%s\t%d\t%d\t%d\t%d\n",c[j].name,c[j].goldNum,c[j].silverNum,c[j].bronzeNum,c[j].totalNum);
-	}
-	fclose(outfp);
-
+loadDate();
 	return 0;
 }
